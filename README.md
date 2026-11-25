@@ -24,14 +24,28 @@ SHA-1  3223f7b056da9c2f9681c8aef2838ee9fb8b8baa
 - The patched file must be named `Brigand NoPlugin.exe`, as the launcher looks for that name.
   The result should be CRC32 `08c4fca8`, SHA-1 `759ed1229251d6c4655b7906403e7c5fdfe31df2`.
 - Delete `d3d9.dll` from the game folder if it's there. It's the 64-bit Direct3D 9 runtime of Windows 10, which XP can't load, and the game uses the system one anyway.
-- Install the DirectX End-User Runtime (June 2010). The game needs `d3dx9_31.dll` and `d3dx9_35.dll`.
-- Convert the WAV files. **Without this, the game still may crash or won't play sounds**, as XP's software sound mixing can't create 24-bit buffers. On any machine with Python 3 and https://sourceforge.net/projects/sox/ (`sox` command should be available for the script):
+
+- Install the DirectX End-User Runtime (June 2010). XP comes with DirectX 9.0c, but without the D3DX libraries the game needs (`d3dx9_31.dll` and `d3dx9_35.dll`).
+
+- Convert the WAV files. **Without this, the game may still crash or not play sounds**, as XP's software sound mixing can't create 24-bit buffers. On Windows (XP included):
+
+  - Copy `wavscan.exe` and `wavscan.exe.config` from `tools/windows` to the game folder, where the `assets` folder is
+  - Run `wavscan.exe`. It lists the files to convert and waits for Enter before changing anything, and the backup goes to `assets_backup` in the game folder.
+  - It needs .NET Framework 2.0, 3.5 or 4.0.
+
+  It also works from the command line, with any folders:
 
   ```
-  python3 tools/wavscan.py "path\to\Brigand\assets" fixed
+  wavscan.exe "path\to\Brigand\assets" "path\to\backup"
   ```
 
-  Then copy the contents of `fixed` over `assets`, overwriting files. Only bit depth and header format change, the sample rate and channel count stay the same. Stereo files, if any, are listed as `WARN` and left alone, as the game loads them as 2D sounds.
+  On any other system with Python 3 and sox:
+
+  ```
+  python3 tools/wavscan.py "path/to/Brigand/assets" "path/to/backup"
+  ```
+
+  Without the backup folder, both only list the files. Only bit depth and header format change, the sample rate and channel count stay the same. Stereo files are listed as `WARN` and left alone, as the game loads them as 2D sounds. To undo, copy the backup folder over `assets`.
 
 ## How it was fixed
 
