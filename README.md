@@ -74,7 +74,7 @@ The last parameter of `load 3dsound` is `iSilentFail` (`Shared/Sound/CSoundC.cpp
 
 The load fails because of the WAV files, most of them are 24-bit. With hardware acceleration the sound card takes 24-bit buffers without complaining, but XP's software mixing refuses them, and the game fails straight at the first sound with acceleration set to "Basic" or "None". DBPro creates buffers without a location flag, so DirectSound places each one in hardware when it's created and keeps the hardware voice for as long as the buffer exists, even when it's silent. The game never deletes sounds during play, so after a few minutes the card runs out of 3D voices, the next buffer goes to software, the 24-bit file can't be loaded there, and the game crashes. Windows 10 has no hardware buffers at all and its software mixing accepts 24-bit, which is why it never crashes there.
 
-Two patches deal with that. The first one is in `DBProSoundDebug.dll`, where `LoadRawSoundCore` picks the buffer flags:
+Two patches deal with that. The first one is in [CSoundC.cpp](https://github.com/Dark-Basic-Software-Limited/Dark-Basic-Pro/blob/af6f19d7fc2919c356c683f7f5b8ec0c37a7d7d9/Dark%20Basic%20Public%20Shared/Dark%20Basic%20Pro%20SDK/Shared/Sound/CSoundC.cpp#L371), where `LoadRawSoundCore` picks the buffer flags:
 
 ```cpp
 DWORD dwFlags=DSBCAPS_CTRLPAN | DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFREQUENCY;
@@ -91,7 +91,7 @@ The second one is in the game code, line 18308, where `sound playing(id) = 0` is
 
 ### The sound quality
 
-On XP the sound was garbled and muffled. `CSoundC.cpp`, `Constructor` sets up DirectSound with:
+On XP the sound was garbled and muffled. [CSoundC.cpp](https://github.com/Dark-Basic-Software-Limited/Dark-Basic-Pro/blob/af6f19d7fc2919c356c683f7f5b8ec0c37a7d7d9/Dark%20Basic%20Public%20Shared/Dark%20Basic%20Pro%20SDK/Shared/Sound/CSoundC.cpp#L76), `Constructor` sets up DirectSound with:
 
 ```cpp
 HRESULT hr = g_pSoundManager->Initialize( m_hWnd, DSSCL_PRIORITY, 2, 22050, 16 );
